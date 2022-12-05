@@ -3,6 +3,9 @@ import wx.xrc
 
 import knn
 
+dataset = "train_strokes.txt"
+
+
 ###########################################################################
 ## Window Class
 ###########################################################################
@@ -150,15 +153,17 @@ class AppGUIWindow(wx.Frame):
         fgSizer2.SetFlexibleDirection(wx.BOTH)
         fgSizer2.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
-        self.m_staticText62 = wx.StaticText(sbSizer5.GetStaticBox(), wx.ID_ANY, u"Path to file", wx.DefaultPosition,
+        self.m_staticText62 = wx.StaticText(sbSizer5.GetStaticBox(), wx.ID_ANY,
+                                            u"Name of file (needs to be in the same directory as the source code):",
+                                            wx.DefaultPosition,
                                             wx.DefaultSize, 0)
         self.m_staticText62.Wrap(-1)
 
         fgSizer2.Add(self.m_staticText62, 0, wx.ALL, 15)
 
-        self.m_textCtrl34 = wx.TextCtrl(sbSizer5.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
+        self.m_textCtrl34 = wx.TextCtrl(sbSizer5.GetStaticBox(), wx.ID_ANY, "train_strokes.txt", wx.DefaultPosition,
                                         wx.DefaultSize, 0)
-        fgSizer2.Add(self.m_textCtrl34, 0, wx.ALL, 5)
+        fgSizer2.Add(self.m_textCtrl34, 0, wx.ALL, 10)
 
         self.m_button59 = wx.Button(sbSizer5.GetStaticBox(), wx.ID_ANY, u"Load Dataset", wx.DefaultPosition,
                                     wx.DefaultSize, 0)
@@ -167,11 +172,11 @@ class AppGUIWindow(wx.Frame):
         fgSizer2.Add((0, 0), 1, wx.EXPAND, 5)
 
         self.m_staticText66 = wx.StaticText(sbSizer5.GetStaticBox(), wx.ID_ANY,
-                                            u"Using data file: C:\\lorem\\ipsum\\data.txt", wx.DefaultPosition,
+                                            u"Using data file: train_strokes.txt", wx.DefaultPosition,
                                             wx.DefaultSize, 0)
         self.m_staticText66.Wrap(-1)
 
-        fgSizer2.Add(self.m_staticText66, 0, wx.ALL, 15)
+        fgSizer2.Add(self.m_staticText66, 0, wx.ALL, 10)
 
         sbSizer5.Add(fgSizer2, 1, wx.EXPAND, 5)
 
@@ -179,14 +184,14 @@ class AppGUIWindow(wx.Frame):
 
         sbSizer6 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Results"), wx.VERTICAL)
 
-        self.m_staticText70 = wx.StaticText(sbSizer6.GetStaticBox(), wx.ID_ANY, u"Analyzed <int> patient records.",
+        self.m_staticText70 = wx.StaticText(sbSizer6.GetStaticBox(), wx.ID_ANY, u"",
                                             wx.DefaultPosition, wx.DefaultSize, 0)
         self.m_staticText70.Wrap(-1)
 
         sbSizer6.Add(self.m_staticText70, 0, wx.ALL, 5)
 
         self.m_staticText69 = wx.StaticText(sbSizer6.GetStaticBox(), wx.ID_ANY,
-                                            u"This patient is <more/less> likely to have a stroke than the general population.",
+                                            u"",
                                             wx.DefaultPosition, wx.DefaultSize, 0)
         self.m_staticText69.Wrap(-1)
 
@@ -201,14 +206,16 @@ class AppGUIWindow(wx.Frame):
 
         # Connect Events
         self.m_button62.Bind(wx.EVT_BUTTON, self.m_buttonPredictOnButtonClick)
-        self.m_button59.Bind(wx.EVT_BUTTON, self.m_button59OnButtonClick)
+        self.m_button59.Bind(wx.EVT_BUTTON, self.m_buttonLoadDatasetOnButtonClick)
 
     def __del__(self):
         pass
 
     # Virtual event handlers, override them in your derived class
     def m_buttonPredictOnButtonClick(self, event):
-        print("hellow workld")
+        with open(dataset) as f:
+            for i, _ in enumerate(f):
+                pass
         # read from input fields
         inputRecord = [99999]
         inputRecord.append(self.m_textCtrl9.GetValue())
@@ -223,13 +230,16 @@ class AppGUIWindow(wx.Frame):
         inputRecord.append(self.m_textCtrl35.GetValue())
         result = ""
         # Make prediction
-        pred = knn.knn_single_prediction(50, inputRecord, "train_strokes.txt")
+        pred = knn.knn_single_prediction(50, inputRecord, dataset)
         if pred:
             result = "more"
         else:
             result = "less"
-        self.m_staticText69.SetLabelText(f"This patient is {result} likely to have a stroke than the general population.")
+        self.m_staticText69.SetLabelText(
+            f"This patient is {result} likely to have a stroke than the general population.")
+        self.m_staticText70.SetLabelText(f"Analyzed {i} patient records.")
 
-    def m_button59OnButtonClick(self, event):
-        event.Skip()
-
+    def m_buttonLoadDatasetOnButtonClick(self, event):
+        global dataset
+        dataset = self.m_textCtrl34.GetValue()
+        self.m_staticText66.SetLabelText(f"Using data file: {dataset}")
