@@ -12,7 +12,7 @@ import math
 def knn_accuracy_testing(k):
     # Prepare the data
     # data = np.genfromtxt("healthcare-dataset-stroke-data.txt", delimiter=',', max_rows=100000)
-    df = pd.read_table("train_strokes.txt", delimiter=',', header=0)
+    df = pd.read_table("train_strokes_subset.txt", delimiter=',', header=0)
 
     '''
     closeData = data[1:,4]
@@ -99,7 +99,7 @@ def knn_accuracy_testing(k):
         predIndex = 0
         for pred in predictions:
             # if pred * Y_testing[predIndex] > 0:
-            if (pred > 0.05 and Y_testing[predIndex] > 0.5) or (pred <= 0.05 and Y_testing[predIndex] < 0.5):
+            if (pred > 0.01 and Y_testing[predIndex] > 0.5) or (pred <= 0.01 and Y_testing[predIndex] < 0.5):
                 num_correct_direction_predictions += 1
             predIndex += 1
         percent_correct_direction_predictions = num_correct_direction_predictions / len(predictions)
@@ -179,7 +179,7 @@ def knn_single_prediction(k, input_record, datasetfile):
     euclidian_distances = np.sqrt(np.sum((X_training - X_input_record_cleaned) ** 2, axis=1))
     prediction = Y_training[np.argsort(euclidian_distances, axis=0)[:k]].mean()
 
-    if prediction > 0.005:
+    if prediction > 0.03:
         return True
     else:
         return False
